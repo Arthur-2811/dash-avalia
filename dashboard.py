@@ -225,6 +225,9 @@ def main():
     # ==========================================
     # SESSÃO 3: ANÁLISE DE RENOVAÇÕES
     # ==========================================
+    # ==========================================
+    # SESSÃO 3: ANÁLISE DE RENOVAÇÕES
+    # ==========================================
     st.markdown("### 🔄 Análise de Renovações por Plano")
     
     if not df_renovacoes.empty:
@@ -250,14 +253,23 @@ def main():
             color_discrete_map=mapa_cores
         )
         
-        # Limpa o visual do gráfico para o modo Dark
-        fig_renov.update_traces(textposition='outside', textfont_size=16, textfont_color='white')
+        # 🎯 O TRUQUE: Se tiver só 1 plano, a barra fica fininha (0.2). Se tiver mais, fica normal (0.5)
+        largura_barra = 0.2 if len(contagem_renov) == 1 else 0.5
+        
+        # Limpa o visual do gráfico para o modo Dark e aplica a largura da barra
+        fig_renov.update_traces(
+            textposition='outside', 
+            textfont_size=16, 
+            textfont_color='white',
+            width=largura_barra
+        )
+        
         fig_renov.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False,
             height=300,
-            margin=dict(t=20, b=20, l=10, r=10),
+            margin=dict(t=30, b=20, l=10, r=10),
             xaxis=dict(title="", showgrid=False, tickfont=dict(size=14, color='#A0A0B5')),
             yaxis=dict(title="", showgrid=False, showticklabels=False) # Esconde o eixo Y para ficar mais limpo
         )
