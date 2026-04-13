@@ -69,7 +69,6 @@ def carregar_dados_planilhas(inicio, fim):
 def main():
     # --- MENU LATERAL ---
     with st.sidebar:
-        # 🎯 BOTÃO DE ATUALIZAR ADICIONADO AQUI
         if st.button("🔄 Atualizar Dados", use_container_width=True, type="primary"):
             st.cache_data.clear()
             st.rerun()
@@ -109,7 +108,8 @@ def main():
     qtd_mensal = total_vendas_novas - qtd_anual - qtd_sem 
     if qtd_mensal < 0: qtd_mensal = 0
     
-    qtd_renovacoes = len(df_vendas[df_vendas['É Renovação']])
+    df_renovacoes = df_vendas[df_vendas['É Renovação']]
+    qtd_renovacoes = len(df_renovacoes)
     
     # --- BANNER DE COMPRADORES (MARQUEE) ---
     if not df_vendas.empty:
@@ -220,6 +220,55 @@ def main():
         """
         st.markdown(html_roas, unsafe_allow_html=True)
 
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ==========================================
+    # SESSÃO 3: ANÁLISE DE RENOVAÇÕES
+    # ==========================================
+    st.markdown("### 🔄 Análise de Renovações por Plano")
+    
+    if not df_renovacoes.empty:
+        # Conta a quantidade de renovações por plano
+        contagem_renov = df_renovacoes['Categoria Plano'].value_counts().reset_index()
+        contagem_renov.columns = ['Plano', 'Quantidade']
+        
+        # Mapeia as cores idênticas aos cartões
+        mapa_cores = {
+            'Anual': '#365C40',
+            'Semestral': '#2D5280',
+            'Mensal': '#643A8A',
+            'Outros': '#445D70'
+        }
+        
+        # Cria o gráfico de barras
+        fig_renov = px.bar(
+            contagem_renov, 
+            x='Plano', 
+            y='Quantidade', 
+            text='Quantidade',
+            color='Plano',
+            color_discrete_map=mapa_cores
+        )
+        
+        # Limpa o visual do gráfico para o modo Dark
+        fig_renov.update_traces(textposition='outside', textfont_size=16, textfont_color='white')
+        fig_renov.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            showlegend=False,
+            height=300,
+            margin=dict(t=20, b=20, l=10, r=10),
+            xaxis=dict(title="", showgrid=False, tickfont=dict(size=14, color='#A0A0B5')),
+            yaxis=dict(title="", showgrid=False, showticklabels=False) # Esconde o eixo Y para ficar mais limpo
+        )
+        
+        st.markdown("<div class='st-card'>", unsafe_allow_html=True)
+        st.plotly_chart(fig_renov, use_container_width=True, config={'displayModeBar': False})
+        st.markdown("</div>", unsafe_allow_html=True)
+    else:
+        st.info("Nenhuma renovação registrada no período selecionado.")
+
+    # --- SESSÃO DEBUG ---
     if mostrar_debug:
         st.markdown("---")
         st.warning("MODO DEBUG ATIVADO")
