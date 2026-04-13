@@ -225,9 +225,6 @@ def main():
     # ==========================================
     # SESSÃO 3: ANÁLISE DE RENOVAÇÕES
     # ==========================================
-    # ==========================================
-    # SESSÃO 3: ANÁLISE DE RENOVAÇÕES
-    # ==========================================
     st.markdown("### 🔄 Análise de Renovações por Plano")
     
     if not df_renovacoes.empty:
@@ -235,15 +232,14 @@ def main():
         contagem_renov = df_renovacoes['Categoria Plano'].value_counts().reset_index()
         contagem_renov.columns = ['Plano', 'Quantidade']
         
-        # Mapeia as cores idênticas aos cartões
+        # 🎯 NOVA PALETA DE CORES: Mais elegante, moderna e fluida com o Dark Mode
         mapa_cores = {
-            'Anual': '#365C40',
-            'Semestral': '#2D5280',
-            'Mensal': '#643A8A',
-            'Outros': '#445D70'
+            'Anual': '#20B2AA',       # Light Sea Green
+            'Semestral': '#4A90E2',   # Azul Moderno
+            'Mensal': '#5E81AC',      # Slate Blue (Azul Acinzentado super premium)
+            'Outros': '#8A8A9E'       # Cinza
         }
         
-        # Cria o gráfico de barras
         fig_renov = px.bar(
             contagem_renov, 
             x='Plano', 
@@ -253,25 +249,28 @@ def main():
             color_discrete_map=mapa_cores
         )
         
-        # 🎯 O TRUQUE: Se tiver só 1 plano, a barra fica fininha (0.2). Se tiver mais, fica normal (0.5)
         largura_barra = 0.2 if len(contagem_renov) == 1 else 0.5
         
-        # Limpa o visual do gráfico para o modo Dark e aplica a largura da barra
+        # 🎯 CORREÇÃO DO NÚMERO CORTADO: cliponaxis=False libera o texto para fora da área de corte
         fig_renov.update_traces(
             textposition='outside', 
-            textfont_size=16, 
+            textfont_size=18, 
             textfont_color='white',
-            width=largura_barra
+            width=largura_barra,
+            cliponaxis=False 
         )
+        
+        # 🎯 CRIA UMA FOLGA NO TOPO (Garante que o número sempre vai aparecer inteiro)
+        max_y = contagem_renov['Quantidade'].max() * 1.3 if not contagem_renov.empty else 10
         
         fig_renov.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             showlegend=False,
             height=300,
-            margin=dict(t=30, b=20, l=10, r=10),
+            margin=dict(t=40, b=20, l=10, r=10), # Aumentei a margem do topo (t=40)
             xaxis=dict(title="", showgrid=False, tickfont=dict(size=14, color='#A0A0B5')),
-            yaxis=dict(title="", showgrid=False, showticklabels=False) # Esconde o eixo Y para ficar mais limpo
+            yaxis=dict(title="", showgrid=False, showticklabels=False, range=[0, max_y]) 
         )
         
         st.markdown("<div class='st-card'>", unsafe_allow_html=True)
